@@ -1,3 +1,10 @@
+library(data.table)
+library(xlsx)
+library(dplyr)
+library(tidyverse)
+setwd('D:/CONSULTORIAS/UGPP/2022/Enero/Informacion_general')
+
+
 already_read <- FALSE
 if(!already_read){
   list_csv_files <- dir()
