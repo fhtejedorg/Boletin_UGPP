@@ -3,7 +3,6 @@ library(xlsx)
 library(dplyr)
 library(tidyverse)
 library(readxl)
-setwd('D:/CONSULTORIAS/UGPP/2022/Enero/Informacion_general')
 rm(list = ls())
 ####################################################################################################################################
 # # Salidas por actividad económica 
