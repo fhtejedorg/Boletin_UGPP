@@ -1,0 +1,65 @@
+---
+title: "Untitled"
+author: "UGPP"
+date: "25/02/2022"
+output: word_document
+---
+
+This is an R Markdown document. Markdown is a simple 
+formatting syntax for authoring HTML, PDF, and MS Word 
+documents. For more details ...
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#<center>![](D:/Resultados_IMC/Presentaciones/logoUGPP.jfif)</center>
+# Librerias
+options(kableExtra.auto_format = FALSE)
+library(xlsx)
+library(dplyr)
+library(data.table)
+library(tidyverse)
+library(tidyr)
+library(janitor)
+library(lubridate)
+library(kableExtra)
+library(knitr)
+library(pander)
+library(flextable)
+library(scales)
+# Carpeta de referencia
+#setwd('D:/CONSULTORIAS/UGPP/2022/Proyectos/Boletin_UGPP')
+source(file = file.path('../src/utils/utils_capitulo2.R'))
+
+panderOptions('table.alignment.default', function(df)
+    ifelse(sapply(df, is.numeric), 'right', 'left'))
+panderOptions('table.split.table', Inf)
+panderOptions('big.mark', ",")
+panderOptions('keep.trailing.zeros', TRUE)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, size = 'tiny'}
+source(file = file.path('../src/data/capitulo2_tabla3.R'))
+tabla3$total$porc. <- percent(tabla3$total$porc., decimal.mark = ',')
+#tabla3$total[, 3:5] <- apply(tabla3$total[, 3:5], 2, comma, decimal.mark = ',', big.mark = '.')
+#kable(tabla3)
+pander(tabla3$total)
+
+tabla3$variaciones_referencia %>% 
+  adorn_pct_formatting(digits = 1) %>%
+  pander()
+```
+
+

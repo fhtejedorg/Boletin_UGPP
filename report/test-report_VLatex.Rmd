@@ -1,0 +1,66 @@
+---
+title: "Title"
+author: "Me"
+header-includes:
+   - \usepackage{bbm}
+output: latex_fragment
+---
+# Introducción
+
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#<center>![](D:/Resultados_IMC/Presentaciones/logoUGPP.jfif)</center>
+# Librerias
+options(kableExtra.auto_format = FALSE)
+library(xlsx)
+library(dplyr)
+library(data.table)
+library(tidyverse)
+library(tidyr)
+library(janitor)
+library(lubridate)
+library(kableExtra)
+library(knitr)
+library(pander)
+library(flextable)
+library(scales)
+library(captioner)
+# Carpeta de referencia
+#setwd('D:/CONSULTORIAS/UGPP/2022/Proyectos/Boletin_UGPP')
+source(file = file.path('../src/utils/utils_capitulo2.R'))
+
+panderOptions('table.alignment.default', function(df)
+    ifelse(sapply(df, is.numeric), 'right', 'left'))
+panderOptions('table.split.table', Inf)
+panderOptions('big.mark', ",")
+panderOptions('keep.trailing.zeros', TRUE)
+
+table_nums <- captioner::captioner(prefix = "Tab.")
+
+tab.3_cap <- table_nums(name = "tab_3", 
+                        caption = 'Total, cotizantes dependientes e independientes por rangos de salario, variaciones porcentuales mensuales y del periodo junio 2020 – junio 2021')
+tab.4_cap <- table_nums(name = "tab_4", 
+                        caption = "Tabla 4. Resumen del reporte de novedades Cotizantes Dependientes - junio 2021")
+```
+
+
+```{r table3, echo=FALSE, message=FALSE, warning=FALSE, fig.cap = tab.3_cap}
+source(file = file.path('../src/data/capitulo2_tabla3.R'))
+tabla3$total$porc. <- percent(tabla3$total$porc., decimal.mark = ',')
+#tabla3$total[, 3:5] <- apply(tabla3$total[, 3:5], 2, comma, decimal.mark = ',', big.mark = '.')
+#kable(tabla3)
+
+
+tabla3$variaciones_interes <- tabla3$variaciones_interes %>%
+  adorn_pct_formatting(digits = 1)
+
+tabla3$variaciones_referencia <- tabla3$variaciones_referencia %>%
+  adorn_pct_formatting(digits = 1)
+
+tabla3_output <- merge(tabla3$total, tabla3$variaciones_interes, 
+                       by = c('Tipologia', 'RangoIBC'), suffixes = c("",""))
+tabla3_output <- merge(tabla3_output, tabla3$variaciones_referencia, 
+                       by = c('Tipologia', 'RangoIBC'), suffixes = c("",""))
+tabla3_output %>% 
+  pander()

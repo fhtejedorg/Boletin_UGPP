@@ -1,0 +1,3 @@
+library(rmarkdown)
+
+rmarkdown::render("report/test-report_VLatex.Rmd", output_format = latex_document(template = NULL))

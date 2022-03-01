@@ -1,0 +1,140 @@
+---
+title: "test-report"
+author: "UGPP"
+date: "25/02/2022"
+output:
+  html_document:
+    df_print: paged
+  word_document:
+    reference_docx: word-styles-reference-01.docx
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#<center>![](D:/Resultados_IMC/Presentaciones/logoUGPP.jfif)</center>
+# Librerias
+options(kableExtra.auto_format = FALSE)
+library(xlsx)
+library(dplyr)
+library(data.table)
+library(tidyverse)
+library(tidyr)
+library(janitor)
+library(lubridate)
+library(kableExtra)
+library(knitr)
+library(pander)
+library(flextable)
+library(scales)
+library(captioner)
+# Carpeta de referencia
+#setwd('D:/CONSULTORIAS/UGPP/2022/Proyectos/Boletin_UGPP')
+source(file = file.path('../src/utils/utils_capitulo2.R'))
+
+panderOptions('table.alignment.default', function(df)
+    ifelse(sapply(df, is.numeric), 'right', 'left'))
+panderOptions('table.split.table', Inf)
+panderOptions('big.mark', ",")
+panderOptions('keep.trailing.zeros', TRUE)
+
+table_nums <- captioner::captioner(prefix = "Tab.")
+
+tab.3_cap <- table_nums(name = "tab_3", 
+                        caption = 'Total, cotizantes dependientes e independientes por rangos de salario, variaciones porcentuales mensuales y del periodo junio 2020 – junio 2021')
+tab.4_cap <- table_nums(name = "tab_4", 
+                        caption = "Tabla 4. Resumen del reporte de novedades Cotizantes Dependientes - junio 2021")
+```
+
+
+# Introducción
+
+El Sistema de Protección Social (SPS) busca garantizar un nivel básico en la calidad de vida de
+los colombianos, a través de la cobertura universal en salud y el aseguramiento de los riesgos de
+invalidez, vejez y muerte.
+La información que se genera a partir de las cotizaciones al SPS, analizada en el contexto económico,
+social, demográfico y geográfico, constituye un insumo fundamental para la toma de decisiones de
+política pública, especialmente en tiempos de crisis, cuando la celeridad y capacidad de focalización
+son fundamentales para suavizar los efectos negativos de una coyuntura como la actual.
+Este boletín proporciona un conjunto de estadísticas a partir de la información de cotizaciones al
+SPS registradas en la Planilla Integrada de Liquidación de Aportes PILA, correspondientes a
+las cotizaciones y relaciones laborales del mes de junio de 2021.
+Para ello se toman los datos reportados por el Ministerio de Salud y Protección Social, con corte al
+13 de agosto de 2021, y todos los tipos de cotizantes, excepto, cotizantes de Carrera Diplomática,
+o Consular, o Funcionario de Organismo Multilateral (32), beneficiario del Fondo de Solidaridad
+Pensional (33), beneficiario UPC Adicional (40), Cotizante independiente pago solo salud (42),
+Cotizante a pensiones con pago por tercero (43), cotizante dependiente de empleo de emergencia
+con duración mayor o igual a un mes (44), cotizante dependiente de empleo de emergencia con
+duración menor a un mes (45), trabajador dependiente de entidad beneficiaria del sistema general
+de participaciones - Aportes Patronales (47) y prepensionado con aporte voluntario en salud (56),
+porque se considera que no son ni cotizantes independientes ni dependientes.
+Para comparar la evolución de los cotizantes mes a mes, se construyó un año típico que refleja la
+estacionalidad y la tendencia normal de las cotizaciones en Colombia, que se resume en un índice
+Estacional Medio Interanual (IEM) fundamentado en la estimación de un valor de referencia de los
+cotizantes de cada mes en relación con enero del año de análisis.
+La estimación del IEM se generó a partir de la información de la serie mensual de cotizantes desde
+enero de 2012 hasta diciembre de 2019, en donde se observa un incremento de cotizantes de
+febrero a junio y de julio a septiembre tal como se muestra en la gráfica 1 y tabla 1. El ejercicio se
+realizó para los cotizantes independientes y dependientes.
+
+## Comportamiento de los cotizantes
+
+La Tabla 1 muestra en detalle, por rango de IBC, el número de cotizantes en junio de 2021 frente a
+junio de 2020 así como las variaciones mensuales del número de cotizantes.
+Se observa una fuerte caída mensual en abril de 2020, cuando los cotizantes dependientes
+presentaron una disminución del 7,7%, los independientes cayeron en 3%. Mientras que para junio
+de 2021 el decrecimiento mensual fue del 0,3% con aumento en las relaciones laborales con IBC de
+más de 5 SMMLV, comportamiento similar a 2020, para los independientes hubo un decrecimiento
+del 2,5% en este periodo.
+
+`r table_nums('tab_3')`
+```{r table3, echo=FALSE, message=FALSE, warning=FALSE, fig.cap = tab.3_cap}
+source(file = file.path('../src/data/capitulo2_tabla3.R'))
+tabla3$total$porc. <- percent(tabla3$total$porc., decimal.mark = ',')
+#tabla3$total[, 3:5] <- apply(tabla3$total[, 3:5], 2, comma, decimal.mark = ',', big.mark = '.')
+#kable(tabla3)
+
+
+tabla3$variaciones_interes <- tabla3$variaciones_interes %>%
+  adorn_pct_formatting(digits = 1)
+
+tabla3$variaciones_referencia <- tabla3$variaciones_referencia %>%
+  adorn_pct_formatting(digits = 1)
+
+tabla3_output <- merge(tabla3$total, tabla3$variaciones_interes, 
+                       by = c('Tipologia', 'RangoIBC'), suffixes = c("",""))
+tabla3_output <- merge(tabla3_output, tabla3$variaciones_referencia, 
+                       by = c('Tipologia', 'RangoIBC'), suffixes = c("",""))
+tabla3_output %>% 
+  pander()
+
+```
+
+En junio 2021 aumentaron 650 mil relaciones laborales, entre los cotizantes dependientes, en
+relación con junio de 2020. Los mayores incrementos se presentan en aquellos que tienen un rango
+de IBC de 2 a 5 SMMLV y menor a 1 SMMLV mientras que hubo leves incrementos anuales en los
+cotizantes por más de 5 SMMLV.
+Para los cotizantes independientes, hubo un aumento de 19 mil relaciones laborales entre junio
+2021 y junio 2020, acompañado del crecimiento del decrecimiento de 32 mil relaciones laborales
+de cotizantes con IBC de menos de 1 SMMLV (-2,2%) y un fuerte crecimiento en los cotizantes con
+más de 5 SMMLV.
+
+### Comportamiento de algunas novedades
+
+La tabla 4 y el gráfico 3 muestran el comportamiento del número de novedades de ingreso, retiro,
+suspensión temporal y vacaciones presentadas en junio de 2019, junio de 2020 y junio de 2021 para
+los cotizantes dependientes, así como sus variaciones mensuales y anuales.
+El comportamiento de las novedades en junio 2021 tuvo un aumento mensual de 12,4% en los
+ingresos, es notorio el incremento de las vacaciones en un 61,6% donde hubo una reducción del
+26,2% en el 2020. Por otro lado, las suspensiones temporales disminuyen en un 12,8% las cuales
+habían caído en un 27,9% en 2020.
+
+
+```{r table4, echo=FALSE, message=FALSE, warning=FALSE, size = 'tiny'}
+source(file = file.path('../src/data/capitulo2_tabla4.R'))
+tabla4  %>% 
+  pander()
+
+```

@@ -1,0 +1,4 @@
+"0","source(file = file.path('../src/data/capitulo2_tabla4.R'))"
+"1","`summarise()` has grouped output by 'MONTH'. You can override using the `.groups` argument.
+"
+"0","tabla4"

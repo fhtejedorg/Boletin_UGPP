@@ -1,0 +1,9 @@
+"0","knitr::opts_chunk$set(echo = TRUE)"
+"2","Warning message:
+"
+"2","In normalizePath(path.expand(path), winslash, mustWork) :"
+"2","
+ "
+"2"," path[1]=""//WURNET.NL/Homes/tejed002/My Documents"": Access is denied
+"
+"0","#knitr::opts_chunk$set(fig.width = 5, fig.asp = 1 / 3)"

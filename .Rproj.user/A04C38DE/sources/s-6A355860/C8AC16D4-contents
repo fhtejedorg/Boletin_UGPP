@@ -1,0 +1,7 @@
+setwd('C:/Users/tejed002/Downloads')
+library(readxl)
+
+data_IBC <- read_xlsx('Anexos tecnicos DIC_21.xlsx', range = 'B14:N33', col_names = FALSE)
+data_IBC2 <- read_xlsx('Anexos tecnicos DIC_21.xlsx', range = 'B38:M57', col_names = FALSE)
+data_IBC3<- read_xlsx('Anexos tecnicos DIC_21.xlsx', range = 'A38:A57', col_names = FALSE)
+data_IBC4<- read_xlsx('Anexos tecnicos DIC_21.xlsx', range = 'B37:M37', col_names = FALSE)

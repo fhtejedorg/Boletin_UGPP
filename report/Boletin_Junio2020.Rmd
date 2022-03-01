@@ -1,0 +1,126 @@
+---
+title: 'Boletín mensual: Evolución de las cotizaciones al Sistema de Protección Social
+  Junio 2021'
+author: "Unidad de Gestión Pensional y Parafiscales - UGPP"
+date: "Periodo - Junio de 2021"
+output:
+  word_document:
+    reference_docx: Style_Boletin.docx
+always_allow_html: true    
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#knitr::opts_chunk$set(fig.width = 5, fig.asp = 1 / 3)
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align = "center", fig.height = 7, fig.width = 12}
+#<center>![](D:/Resultados_IMC/Presentaciones/logoUGPP.jfif)</center>
+# Librerias
+options(kableExtra.auto_format = FALSE)
+library(xlsx)
+library(dplyr)
+library(data.table)
+library(tidyverse)
+library(tidyr)
+library(janitor)
+library(lubridate)
+library(kableExtra)
+library(knitr)
+library(pander)
+# Carpeta de referencia
+setwd('D:/CONSULTORIAS/UGPP/2022/Proyectos/Boletin_UGPP')
+source(file = file.path('src/utils/utils_capitulo2.R'))
+
+panderOptions('table.alignment.default', function(df)
+    ifelse(sapply(df, is.numeric), 'right', 'left'))
+panderOptions('table.split.table', Inf)
+panderOptions('big.mark', ",")
+panderOptions('keep.trailing.zeros', TRUE)
+
+```
+
+
+# Introducción
+
+El Sistema de Protección Social (SPS) busca garantizar un nivel básico en la calidad de vida de
+los colombianos, a través de la cobertura universal en salud y el aseguramiento de los riesgos de
+invalidez, vejez y muerte.
+La información que se genera a partir de las cotizaciones al SPS, analizada en el contexto económico,
+social, demográfico y geográfico, constituye un insumo fundamental para la toma de decisiones de
+política pública, especialmente en tiempos de crisis, cuando la celeridad y capacidad de focalización
+son fundamentales para suavizar los efectos negativos de una coyuntura como la actual.
+Este boletín proporciona un conjunto de estadísticas a partir de la información de cotizaciones al
+SPS registradas en la Planilla Integrada de Liquidación de Aportes PILA, correspondientes a
+las cotizaciones y relaciones laborales del mes de junio de 2021.
+Para ello se toman los datos reportados por el Ministerio de Salud y Protección Social, con corte al
+13 de agosto de 2021, y todos los tipos de cotizantes, excepto, cotizantes de Carrera Diplomática,
+o Consular, o Funcionario de Organismo Multilateral (32), beneficiario del Fondo de Solidaridad
+Pensional (33), beneficiario UPC Adicional (40), Cotizante independiente pago solo salud (42),
+Cotizante a pensiones con pago por tercero (43), cotizante dependiente de empleo de emergencia
+con duración mayor o igual a un mes (44), cotizante dependiente de empleo de emergencia con
+duración menor a un mes (45), trabajador dependiente de entidad beneficiaria del sistema general
+de participaciones - Aportes Patronales (47) y prepensionado con aporte voluntario en salud (56),
+porque se considera que no son ni cotizantes independientes ni dependientes.
+Para comparar la evolución de los cotizantes mes a mes, se construyó un año típico que refleja la
+estacionalidad y la tendencia normal de las cotizaciones en Colombia, que se resume en un índice
+Estacional Medio Interanual (IEM) fundamentado en la estimación de un valor de referencia de los
+cotizantes de cada mes en relación con enero del año de análisis.
+La estimación del IEM se generó a partir de la información de la serie mensual de cotizantes desde
+enero de 2012 hasta diciembre de 2019, en donde se observa un incremento de cotizantes de
+febrero a junio y de julio a septiembre tal como se muestra en la gráfica 1 y tabla 1. El ejercicio se
+realizó para los cotizantes independientes y dependientes.
+
+### Comportamiento de los cotizantes
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+setwd('D:/CONSULTORIAS/UGPP/2022/Proyectos/Boletin_UGPP')
+dat_master_meses <- read.xlsx('data/external/master_salidas.xlsx', sheetName = 'Meses')
+dat_master_rangoIBC <- read.xlsx('data/external/master_salidas.xlsx', sheetName = 'Rango IBC')
+dat_master_periodos <- read.xlsx('data/external/master_salidas.xlsx', sheetName = 'periodos_datos')
+dat_master_anomes <- read.xlsx('data/external/master_salidas.xlsx', sheetName = 'Ano_Mes')
+
+## Definición de variables generales 
+mes_interes <- 8
+mes_referencia <- mes_interes
+ano_interes <- 2021
+ano_referencia <- 2020
+meses_variacion <- 4
+tabla3 <- fun_tabla3(mes_interes, mes_referencia, 
+           ano_interes, ano_referencia,
+           dat_master_anomes, dat_master_rangoIBC, meses_variacion)
+tabla3$total %>% kable() %>%  kable_styling(font_size = 7)
+#tabla3$variaciones_interes
+#tabla3$variaciones_referencia %>% kable()
+```
+
+Novedades
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+setwd('D:/CONSULTORIAS/UGPP/2022/Proyectos/Boletin_UGPP')
+
+# Datos de entrada
+# # Lectura del master de salidas
+dat_master_meses <- read.xlsx('data/external/master_salidas.xlsx', sheetName = 'Meses')
+dat_master_rangoIBC <- read.xlsx('data/external/master_salidas.xlsx', sheetName = 'Rango IBC')
+dat_master_periodos <- read.xlsx('data/external/master_salidas.xlsx', sheetName = 'periodos_datos')
+dat_master_anomes <- read.xlsx('data/external/master_salidas.xlsx', sheetName = 'Ano_Mes')
+
+## Definición de variables generales 
+mes_interes <- 6
+mes_referencia <- 5
+ano_interes <- 2021
+ano_referencia <- 2020
+ano_referencia_2 <- 2019
+tabla4 <- fun_tabla4(mes_interes, mes_referencia, 
+           ano_interes, ano_referencia,
+           ano_referencia_2,
+           dat_master_anomes)
+tabla4 %>% kable() %>% kable_styling()
+```
+
+
+
+
