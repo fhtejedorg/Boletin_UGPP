@@ -72,7 +72,7 @@ fun_tabla3 <- function(mes_interes, mes_referencia,
   
   nombres_salida_total <- dat_master_anomes %>% filter(Codigo == mes_interes & Ano %in% c(ano_interes, ano_referencia))
   setnames(salida_tabla3_total, old = c('referencia','interes', 'diferencia', 'variacion'), 
-           new = c(nombres_salida_total$Nombre, 'dif.', 'porc.'))
+           new = c(nombres_salida_total$Nombre, 'dif', 'porc'))
   # Variaciones en meses
   
   ano_mes_interes <- paste(ano_interes, mes_interes, '1', sep ='/')
@@ -141,25 +141,10 @@ fun_tabla3 <- function(mes_interes, mes_referencia,
 
 
 
-fun_tabla4 <- function(mes_interes, mes_referencia, 
-                       ano_interes, ano_referencia,
-                       ano_referencia_2,
-                       dat_master_anomes){
-  string_all <- 'Salidas_generales_rangoIBC'
-  list_csv_files <- dir(path = '../data/raw/')
-  list_datos <- list_csv_files[grep(string_all, list_csv_files)]
-  dat_consolidado_all <- NULL
-  for(ii in 1:length(list_datos)){
-    datos_lectura <- fread(file = file.path('../data/raw/', list_datos[ii]))
-    dat_consolidado_all <- rbind(dat_consolidado_all, datos_lectura)
-  } 
-  
-  dat_consolidado_all$ano_mes <- with(dat_consolidado_all, paste(YEAR,MONTH,'1', sep = '/'))
-  dat_consolidado_all$ano_mes <- as.Date(dat_consolidado_all$ano_mes)
-  
-  salida_tabla4A_total <- dat_consolidado_all %>%
-    filter(MONTH %in% c(mes_interes, mes_referencia) & 
-             YEAR %in% c(ano_interes, ano_referencia, ano_referencia_2)) %>%
+fun_tabla4 <- function(dat_consolidado){
+  salida_tabla4A_total <- dat_consolidado %>%
+    # filter(MONTH %in% c(mes_interes, mes_referencia) & 
+    #          YEAR %in% c(ano_interes, ano_referencia, ano_referencia_2)) %>%
     group_by(MONTH, YEAR) %>%
     summarise(Ingreso = sum(ingreso_Max_Sum),
               Retiro = sum(retiro_Max_Sum),
@@ -170,28 +155,70 @@ fun_tabla4 <- function(mes_interes, mes_referencia,
   salida_tabla4A_total <- melt(setDT(salida_tabla4A_total), id.vars = c('MONTH', 'YEAR'), 
                                variable.name = 'Novedad', value.name = 'Total')
   salida_tabla4A_total <- merge(salida_tabla4A_total, 
-                                dat_master_anomes[, c('Codigo', 'Ano','Nombre')],
+                                dat_master_anomes,
                                 by.x = c('MONTH', 'YEAR'),
                                 by.y = c('Codigo', 'Ano'))
-  salida_tabla4A_total <- salida_tabla4A_total %>% arrange(YEAR,Novedad, MONTH)
+  salida_tabla4A_total <- salida_tabla4A_total %>% arrange(Novedad, YEAR, MONTH)
   salida_tabla4A_total <- salida_tabla4A_total %>% 
     mutate(lag_total_mes = lag(Total)) %>%
-    mutate(variacion_mes = (Total - lag_total_mes) / lag_total_mes)
+    mutate(variacion_mes = (Total - lag_total_mes) / lag_total_mes) ## PAra obtener datos de variación mensual, eliminar todos los primeros de cada ano 
   
   salida_tabla4A_total <- salida_tabla4A_total %>% arrange(MONTH, Novedad, YEAR) %>% 
     mutate(lag_total_year = lag(Total)) %>%
-    mutate(variacion_ano = (Total - lag_total_year) / lag_total_year)  
-  
+    mutate(variacion_ano = (Total - lag_total_year) / lag_total_year)  ### PAra obtener variaciones inter anuales eliminar datos de 2018 
+
   salida_tabla4A_total$Nombre <- factor(salida_tabla4A_total$Nombre, dat_master_anomes$Nombre)
-  tabla4_1 <- salida_tabla4A_total %>% select(Novedad, Total, Nombre) %>% 
-    spread(Nombre, Total)
-  tabla4_2 <- salida_tabla4A_total %>% select(Novedad, variacion_mes , Nombre) %>% 
-    spread(Nombre, variacion_mes )
-  tabla4_3 <- salida_tabla4A_total %>% 
-    filter(MONTH == 6) %>% 
-    select(Novedad, variacion_ano , Nombre) %>% 
-    spread(Nombre, variacion_ano )
+  salida_tabla4A_total$Nombre <- ordered(salida_tabla4A_total$Nombre, levels = dat_master_anomes$Nombre)
   
-  return(salida_tabla4A_total)
+  salida_tabla4A_total$Mes_corto <- factor(salida_tabla4A_total$Mes_corto, dat_master_anomes$Mes_corto[1:12])
+  salida_tabla4A_total$Mes_corto <- ordered(salida_tabla4A_total$Mes_corto, levels = dat_master_anomes$Mes_corto[1:12])
   
+  salida_tabla4A_total$Ano_corto <- factor(salida_tabla4A_total$Ano_corto)
+  
+  salidas_inter_mensuales <- salida_tabla4A_total %>% 
+    filter(MONTH != 1) %>% select(MONTH, YEAR, Ano_corto, Mes_corto, Novedad, Nombre, variacion_mes) %>% 
+    arrange(Novedad, YEAR, MONTH)
+  
+  salidas_inter_anuales <- salida_tabla4A_total %>% 
+    filter(YEAR != 2018) %>% 
+    select(MONTH, YEAR, Ano_corto, Novedad, Nombre, variacion_ano) %>% 
+    arrange(MONTH, Novedad, YEAR)
+  return(list(mensual = salidas_inter_mensuales, anual = salidas_inter_anuales, totales = salida_tabla4A_total))
+  
+}
+
+
+fun_genera_tabla_4_2 <- function(tabla_4_2_referencia, tabla_4_2_meses_split, mes_interes, mes_referencia2){
+  salida_dependientes_novedades_resto <- tabla_4_2_referencia %>% 
+    mutate(spark = map(tabla_4_2_meses_split, kableExtra::spec_plot),
+           spark = map(spark, "svg_text"),
+           spark = map(spark, ~html(as.character(.x)))) %>% 
+    gt() %>% 
+    cols_label(
+      spark = paste(mes_referencia2, mes_interes, sep = '-')
+    ) %>% 
+    fmt_number(columns = 2:3, sep_mark =  '.', dec_mark = ',', decimals = 0)  %>% 
+    tab_spanner(
+      label = md("Dependientes"),
+      columns = c(2,3)
+    ) %>% 
+    tab_style(
+      style = cell_text(color = "black", weight = "bold"),
+      locations = list(
+        cells_column_spanners(everything()),
+        cells_column_labels(everything())
+      )
+    ) %>%  
+    tab_options(
+      row_group.border.top.width = px(3),
+      row_group.border.top.color = "black",
+      row_group.border.bottom.color = "black",
+      table.border.top.color = "white",
+      table.border.top.width = px(3),
+      table.border.bottom.color = "white",
+      table.border.bottom.width = px(3),
+      column_labels.border.bottom.color = "black",
+      column_labels.border.bottom.width = px(2),
+    )
+  return(salida_dependientes_novedades_resto)
 }
