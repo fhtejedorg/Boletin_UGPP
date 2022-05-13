@@ -41,7 +41,7 @@ for(ii in 1:length(list_datos)){
 dat_consolidado_all$ano_mes <- with(dat_consolidado_all, paste(YEAR,MONTH,'1', sep = '/'))
 dat_consolidado_all$ano_mes <- as.Date(dat_consolidado_all$ano_mes)
 
-dat_consolidado_dependientes <- dat_consolidado_all %>% filter(Tipologia %in% c('Dep_sec_priv', 'Dep_No_priv'))
+dat_consolidado_dependientes <- dat_consolidado_all %>% filter(Tipologia %in% c('Dep_sec_priv'))
 tabla4_dependientes <- fun_tabla4(dat_consolidado_dependientes)
 
 tabla_plot4_Dep_1 <- tabla4_dependientes$totales %>% filter(Novedad %in% c('Ingreso', 'Retiro') & Nombre >= mes_referencia)

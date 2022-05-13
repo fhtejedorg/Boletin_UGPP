@@ -98,8 +98,8 @@ for(ii in 1:6){
 fun_output_resumen(matriz_12_21$matriz_dep, title = "salida_resumen_dependientes_interes_21.png")
 fun_output_resumen(matriz_11_21$matriz_dep, title = "salida_resumen_dependientes_referencia_21.png")
 
-fun_output_resumen(matriz_12_20$matriz_ind, title = "salida_resumen_dependientes_interes_20.png")
-fun_output_resumen(matriz_12_19$matriz_ind, title = "salida_resumen_dependientes_interes_19.png")
+fun_output_resumen(matriz_12_20$matriz_dep, title = "salida_resumen_dependientes_interes_20.png")
+fun_output_resumen(matriz_12_19$matriz_dep, title = "salida_resumen_dependientes_interes_19.png")
 
 
 ## SECCION - Relaciones laborales que permanecieron (DEPENDIENTES)
@@ -119,6 +119,10 @@ tabla_dependientes_19 <- data.frame(matriz_12_19$transision_dep)
 colnames(tabla_dependientes_19)<-c(column_names_IBC, column_names_complemento)
 tabla_dependientes_19$rownames_1 <- column_names_IBC
 
+tabla_dependientes_21 <- rename(tabla_dependientes_21, 'Incrementa' = 'Disminuyen', 'Disminuye' = 'Incrementan')
+tabla_dependientes_20 <- rename(tabla_dependientes_20, 'Incrementa' = 'Disminuyen', 'Disminuye' = 'Incrementan')
+tabla_dependientes_19 <- rename(tabla_dependientes_19, 'Incrementa' = 'Disminuyen', 'Disminuye' = 'Incrementan')
+
 fun_output_matriz_transicion(tabla_dependientes_21, "salida_matriz_transicion_dependientes_21.png")
 fun_output_matriz_transicion(tabla_dependientes_20, "salida_matriz_transicion_dependientes_20.png")
 fun_output_matriz_transicion(tabla_dependientes_19, "salida_matriz_transicion_dependientes_19.png")
@@ -130,7 +134,7 @@ mes_interes <- month(date_interes)
 ano_referencia <- 2018:2021
 label_mes_interes <- 'Dic-21'
 label_mes_referencia_1 <- 'Nov-21'
-label_mes_referencia_2 <- 'Nov-21'
+label_mes_referencia_2 <- 'Dic-20'
 
 tabla_actividad_econ_4 <- "Salidas_generales_Aeconomica9_12_2021.csv"
 tabla_actividad_econ_3 <- "Salidas_generales_Aeconomica9_12_2020.csv"
@@ -169,6 +173,10 @@ tabla_independientes_19 <- data.frame(matriz_12_19$transision_ind)
 colnames(tabla_independientes_19)<-c(column_names_IBC, column_names_complemento)
 tabla_independientes_19$rownames_1 <- column_names_IBC
 
+tabla_independientes_21 <- rename(tabla_independientes_21, 'Incrementa' = 'Disminuyen', 'Disminuye' = 'Incrementan')
+tabla_independientes_20 <- rename(tabla_independientes_20, 'Incrementa' = 'Disminuyen', 'Disminuye' = 'Incrementan')
+tabla_independientes_19 <- rename(tabla_independientes_19, 'Incrementa' = 'Disminuyen', 'Disminuye' = 'Incrementan')
+
 fun_output_matriz_transicion(tabla_independientes_21, "salida_matriz_transicion_independientes_21.png")
 fun_output_matriz_transicion(tabla_independientes_20, "salida_matriz_transicion_independientes_20.png")
 fun_output_matriz_transicion(tabla_independientes_19, "salida_matriz_transicion_independientes_19.png")
@@ -180,7 +188,7 @@ mes_interes <- month(date_interes)
 ano_referencia <- 2018:2021
 label_mes_interes <- 'Dic-21'
 label_mes_referencia_1 <- 'Nov-21'
-label_mes_referencia_2 <- 'Nov-21'
+label_mes_referencia_2 <- 'Dic-20'
 
 tabla_actividad_econ_4 <- "Salidas_generales_Aeconomica9_12_2021.csv"
 tabla_actividad_econ_3 <- "Salidas_generales_Aeconomica9_12_2020.csv"

@@ -268,7 +268,6 @@ fun_salidas_entradas_anual <- function(dinamica_serie){
          plot = gg_salen)
 }
 
-
 fun_output_resumen_act_econ <- function(tabla1, tabla2, tabla3, tabla4, ano_interes, mes_interes, ano_referencia,  
                                          label_mes_interes, label_mes_referencia_1, label_mes_referencia_2, 
                                          tipologia, title){
@@ -324,12 +323,33 @@ fun_output_resumen_act_econ <- function(tabla1, tabla2, tabla3, tabla4, ano_inte
   salida_temp_B$distribucion <- salida_temp_B$Total_cotizantes4.x/salida_temp_B[salida_temp_B$Seccion_fn == 'Total', 'Total_cotizantes4.x']
   
   salida_base_general_publica <- merge(salida_temp_B, nom_seccion, all.x = T)
-  salida_base_general_publica <- salida_base_general_publica %>% select(Seccion_fn, Seccion_nom, Total_cotizantes4, Total_cotizantes4.y, Total_cotizantes4.x, distribucion, variacion_mensual, variacion_anual)
+  salida_base_general_publica <- salida_base_general_publica %>% 
+    select(Seccion_fn, Seccion_nom, 
+           Total_cotizantes4,   ##referencia 2
+           Total_cotizantes4.y, #referencia 1
+           Total_cotizantes4.x, #interes
+           distribucion, variacion_mensual, variacion_anual)
   salida_base_general_publica$Seccion_nom <- ifelse(is.na(salida_base_general_publica$Seccion_nom), 'Total', salida_base_general_publica$Seccion_nom)
   
-  salida_publica <- salida_base_general_publica %>% 
+  salida_base_general_publica_1 <- salida_base_general_publica %>% filter(Seccion_fn != 'Total') %>% arrange(desc(Total_cotizantes4.x))
+  salida_base_general_publica_2 <- salida_base_general_publica %>% filter(Seccion_fn == 'Total')
+  
+  salida_base_general_publica_out <- rbind(salida_base_general_publica_1, salida_base_general_publica_2)
+  salida_publica <- salida_base_general_publica_out %>% 
     gt() %>% 
-    fmt_percent(columns = 6:8, scale_values = TRUE, decimals = 1)  %>% 
+    data_color(
+      columns = 7, 
+      colors = scales::col_numeric(
+        palette = paletteer::paletteer_d(
+          palette = "ggsci::red_material", direction = -1) %>% as.character(),
+        domain = NULL)) %>%
+    data_color(
+      columns = 8, 
+      colors = scales::col_numeric(
+        palette = paletteer::paletteer_d(
+          palette = "ggsci::orange_material", direction = -1) %>% as.character(),
+        domain = NULL)) %>%  
+  fmt_percent(columns = 6:8, scale_values = TRUE, decimals = 1)  %>% 
     fmt_number(columns = 3:5, sep_mark =  '.', dec_mark = ',', decimals = 0)  %>% 
     tab_style(
       style = list(
@@ -364,9 +384,9 @@ fun_output_resumen_act_econ <- function(tabla1, tabla2, tabla3, tabla4, ano_inte
     cols_label(
       Seccion_fn = 'Sec.',
       Seccion_nom = 'Actividad(sección CIIU Rev.4)',
-      Total_cotizantes4 = label_mes_interes,
+      Total_cotizantes4.x = label_mes_interes, 
       Total_cotizantes4.y = label_mes_referencia_1, 
-      Total_cotizantes4.x = label_mes_referencia_2, 
+      Total_cotizantes4 = label_mes_referencia_2,
       distribucion = 'Distribución(%)',
       variacion_mensual = 'Var.Mensual(%)', 
       variacion_anual = 'Var.Anual(%)'
